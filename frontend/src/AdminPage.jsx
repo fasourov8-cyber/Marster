@@ -25,6 +25,34 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [config, setConfig] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState({});
+
+  const uploadMemeImage = async (i, file) => {
+    if (!file) return;
+    setUploading((u) => ({ ...u, [i]: true }));
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const r = await fetch(`${API}/api/admin/upload`, {
+        method: "POST",
+        credentials: "include",
+        body: fd,
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        throw new Error(typeof d.detail === "string" ? d.detail : "Upload failed");
+      }
+      const { url } = await r.json();
+      const memes = [...config.memes];
+      memes[i] = { ...memes[i], image: url };
+      setConfig({ ...config, memes });
+      toast.success("Image uploaded — hit Save changes to go live");
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setUploading((u) => ({ ...u, [i]: false }));
+    }
+  };
 
   useEffect(() => {
     document.title = "MARSter Admin";
@@ -175,18 +203,57 @@ export default function AdminPage() {
                 <div key={i} className="mb-5 rounded-lg border border-[#4a2418] bg-[#150a07] p-4" data-testid={`admin-meme-slot-${i + 1}`}>
                   <p className="mb-3 text-xs uppercase tracking-widest text-[#8be9ff]">{MEME_SLOTS[i]?.name || `Meme ${i + 1}`}</p>
                   <div className="flex flex-col gap-3">
-                    <input
-                      data-testid={`admin-meme-${i + 1}-image`}
-                      type="text"
-                      value={m.image || ""}
-                      onChange={(e) => {
-                        const memes = [...config.memes];
-                        memes[i] = { ...memes[i], image: e.target.value };
-                        setConfig({ ...config, memes });
-                      }}
-                      placeholder="Image URL (optional — replaces the built-in meme)"
-                      className="rounded-lg border border-[#4a2418] bg-[#1f0e0a] px-4 py-2.5 text-sm text-[#fff0e2] outline-none focus:border-[#ffcf3d]"
-                    />
+                    <div className="flex items-center gap-3">
+                      <input
+                        data-testid={`admin-meme-${i + 1}-image`}
+                        type="text"
+                        value={m.image || ""}
+                        onChange={(e) => {
+                          const memes = [...config.memes];
+                          memes[i] = { ...memes[i], image: e.target.value };
+                          setConfig({ ...config, memes });
+                        }}
+                        placeholder="Image URL (optional — replaces the built-in meme)"
+                        className="flex-1 rounded-lg border border-[#4a2418] bg-[#1f0e0a] px-4 py-2.5 text-sm text-[#fff0e2] outline-none focus:border-[#ffcf3d]"
+                      />
+                      <label
+                        data-testid={`admin-meme-${i + 1}-upload`}
+                        className={`cursor-pointer whitespace-nowrap rounded-lg bg-[#8be9ff] px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-[#12081f] transition-opacity hover:opacity-90 ${uploading[i] ? "pointer-events-none opacity-50" : ""}`}
+                      >
+                        {uploading[i] ? "Uploading…" : "Upload"}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/gif,image/webp"
+                          className="hidden"
+                          onChange={(e) => {
+                            uploadMemeImage(i, e.target.files?.[0]);
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                    </div>
+                    {m.image && (
+                      <div className="flex items-center gap-3">
+                        <img
+                          data-testid={`admin-meme-${i + 1}-preview`}
+                          src={m.image.startsWith("/") ? `${API}${m.image}` : m.image}
+                          alt={`Meme ${i + 1} preview`}
+                          className="h-16 w-24 rounded-md border border-[#4a2418] object-cover"
+                        />
+                        <button
+                          type="button"
+                          data-testid={`admin-meme-${i + 1}-clear`}
+                          onClick={() => {
+                            const memes = [...config.memes];
+                            memes[i] = { ...memes[i], image: "" };
+                            setConfig({ ...config, memes });
+                          }}
+                          className="text-xs uppercase tracking-widest text-[#ef3a24] underline-offset-4 hover:underline"
+                        >
+                          Remove image
+                        </button>
+                      </div>
+                    )}
                     <div className="flex gap-3">
                       <input
                         data-testid={`admin-meme-${i + 1}-top`}

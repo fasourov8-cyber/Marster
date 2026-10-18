@@ -50,6 +50,11 @@ Ported features (all verified via screenshots):
 - Admin panel Meme bay section: per-slot image URL + top/bottom captions; image URL replaces the built-in panel
 - Main page applies overrides in runSetup (captions via .cap text, image via img.meme-img covering frame)
 
+## Meme image uploads (2026-10-18)
+- Emergent object storage integration: POST /api/admin/upload (admin-only, JPG/PNG/GIF/WEBP, 5MB max) → stores at marster/memes/{uuid}, tracked in db.files (soft-delete pattern); GET /api/files/{path} serves publicly (DB-checked)
+- Admin meme slots: Upload button + preview thumbnail + Remove image; uploaded URL (relative /api/files/...) fills the slot's image field
+- EMERGENT_LLM_KEY added to backend/.env for storage auth
+
 ## Backlog
 - P0: Put real CA + X/Telegram links into CFG in src/MarsterPage.jsx
 - P1: Live price/market-cap widget (dexscreener API) after launch
