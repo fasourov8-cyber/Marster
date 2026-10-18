@@ -305,7 +305,6 @@ export default function MarsterPage() {
 
         <div className="wrap">
           <div className="hero-copy">
-            <p className="label rise" data-testid="hero-eyebrow">Meme token / launching on pump.fun</p>
             <h1 className="rise" data-testid="hero-headline">Flying Tesla <span>Roadster</span></h1>
             <p className="sub rise" data-testid="hero-subline">The MARSter of memes. One red roadster, one dusty road and 225 million kilometres to go. Humans are crawling, flying and carpooling there behind it.</p>
             <div className="actions rise" id="heroActions"></div>
