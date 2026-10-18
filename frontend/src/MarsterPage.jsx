@@ -8,7 +8,6 @@ const CFG = {
   links: [
     { label: "Buy on pump.fun", href: "https://pump.fun", primary: true, testid: "link-pumpfun" },
     { label: "X / Twitter", href: "", testid: "link-twitter" },
-    { label: "Telegram", href: "", testid: "link-telegram" },
   ],
 };
 
@@ -503,7 +502,7 @@ export default function MarsterPage() {
               <li data-testid="buy-step-1"><div className="n">1</div><h3>Get a wallet</h3><p>Install a Solana wallet such as Phantom or Solflare and save your recovery phrase offline.</p></li>
               <li data-testid="buy-step-2"><div className="n">2</div><h3>Add SOL</h3><p>Buy SOL on an exchange and send it to your wallet address.</p></li>
               <li data-testid="buy-step-3"><div className="n">3</div><h3>Open pump.fun</h3><p>Connect your wallet and search for the contract address shown on this page.</p></li>
-              <li data-testid="buy-step-4"><div className="n">4</div><h3>Check, then buy</h3><p>Match the address against the one pinned on our official X and Telegram before you trade.</p></li>
+              <li data-testid="buy-step-4"><div className="n">4</div><h3>Check, then buy</h3><p>Match the address against the one pinned on our official X before you trade.</p></li>
             </ol>
           </div>
         </section>
