@@ -297,3 +297,78 @@ footer p + p { margin-top: 10px; }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   .ticker div { flex-wrap: wrap; width: auto; }
 }
+
+/* ---------- space vibes (all sections below the hero) ---------- */
+.spacey { position: relative; overflow: hidden; }
+.cosmos { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.cosmos i { position: absolute; background: #fff; border-radius: 50%; opacity: 0.55; animation: twinkle 3.2s ease-in-out infinite alternate; }
+.spacey > .wrap { position: relative; z-index: 1; }
+
+.mini-planet { position: absolute; z-index: 0; border-radius: 50%; pointer-events: none; }
+.mini-planet.p-mars {
+  width: 130px; height: 130px; max-width: 100%;
+  background: radial-gradient(circle at 32% 30%, #ffb27a 0%, #d4541f 58%, #8c3015 100%);
+  box-shadow: 0 0 46px rgba(255, 140, 80, 0.35);
+  animation: planet-drift 14s ease-in-out infinite alternate;
+}
+.mini-planet.p-ice {
+  width: 62px; height: 62px; max-width: 100%;
+  background: radial-gradient(circle at 32% 30%, #cfeeff 0%, #4fa8d8 58%, #1f5a8c 100%);
+  box-shadow: 0 0 30px rgba(139, 233, 255, 0.3);
+  animation: planet-drift 11s ease-in-out infinite alternate-reverse;
+}
+@keyframes planet-drift {
+  from { transform: translateY(0) rotate(0deg); }
+  to { transform: translateY(-26px) rotate(9deg); }
+}
+
+.ring-deco {
+  position: absolute; z-index: 0; pointer-events: none;
+  border: 2px solid rgba(255, 207, 61, 0.3); border-radius: 50%;
+  animation: ring-spin 26s linear infinite;
+}
+@keyframes ring-spin { to { transform: rotate(360deg); } }
+
+.comet {
+  position: absolute; z-index: 0; width: 3px; height: 3px; border-radius: 50%;
+  background: #fff; box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.6);
+  opacity: 0; pointer-events: none;
+}
+.comet::after {
+  content: ""; position: absolute; right: 2px; top: 1px; width: 90px; height: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.85), transparent);
+}
+.comet.c1 { top: 12%; left: 78%; animation: comet-fly 9s linear infinite; }
+.comet.c2 { top: 30%; left: 88%; animation: comet-fly 15s linear infinite 5s; }
+@keyframes comet-fly {
+  0% { opacity: 0; transform: translate(0, 0); }
+  5% { opacity: 1; }
+  20% { opacity: 0; transform: translate(-42vw, 16vh); }
+  100% { opacity: 0; transform: translate(-42vw, 16vh); }
+}
+
+.satellite {
+  position: absolute; z-index: 0; width: 72px; pointer-events: none;
+  animation: sat-drift 18s ease-in-out infinite alternate;
+}
+@keyframes sat-drift {
+  from { transform: translate(0, 0) rotate(-8deg); }
+  to { transform: translate(-34px, 24px) rotate(11deg); }
+}
+
+.astro {
+  position: absolute; z-index: 0; width: 92px; max-width: 100%; pointer-events: none;
+  animation: astro-float 7s ease-in-out infinite alternate;
+}
+@keyframes astro-float {
+  from { transform: translateY(0) rotate(-6deg); }
+  to { transform: translateY(-30px) rotate(8deg); }
+}
+
+/* scroll reveal */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s cubic-bezier(.2,.8,.2,1), transform 0.8s cubic-bezier(.2,.8,.2,1); }
+.reveal.in { opacity: 1; transform: none; }
+.reveal.d1 { transition-delay: 0.08s; }
+.reveal.d2 { transition-delay: 0.16s; }
+.reveal.d3 { transition-delay: 0.24s; }
+.reveal.d4 { transition-delay: 0.32s; }

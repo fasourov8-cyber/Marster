@@ -61,6 +61,36 @@ export default function MarsterPage() {
       }
     }
 
+    /* ---- cosmos star layers in lower sections ---- */
+    root.querySelectorAll("[data-stars]").forEach((box) => {
+      if (box.childElementCount > 0) return;
+      const n = parseInt(box.getAttribute("data-stars"), 10) || 40;
+      for (let i = 0; i < n; i++) {
+        const s = document.createElement("i");
+        const sz = 0.8 + Math.random() * 1.6;
+        s.style.cssText = "left:" + (Math.random() * 100) + "%;top:" + (Math.random() * 100) + "%;width:" + sz.toFixed(1) + "px;height:" + sz.toFixed(1) + "px;animation-delay:-" + (Math.random() * 3).toFixed(2) + "s;animation-duration:" + (2.4 + Math.random() * 3.4).toFixed(2) + "s";
+        box.appendChild(s);
+      }
+    });
+
+    /* ---- scroll reveal ---- */
+    const revealEls = Array.from(root.querySelectorAll(".reveal"));
+    let io = null;
+    if ("IntersectionObserver" in window) {
+      io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            en.target.classList.add("in");
+            io.unobserve(en.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      revealEls.forEach((el) => io.observe(el));
+    } else {
+      revealEls.forEach((el) => el.classList.add("in"));
+    }
+    cleanups.push(() => { if (io) io.disconnect(); });
+
     /* ---- ticker: duplicate for a seamless loop ---- */
     const track = $("tickerTrack");
     if (track && !track.dataset.dup) {
@@ -331,15 +361,17 @@ export default function MarsterPage() {
 
       <main>
         {/* ================= LORE ================= */}
-        <section className="lore" id="lore" data-testid="lore-section">
+        <section className="lore spacey" id="lore" data-testid="lore-section">
+          <div className="cosmos" data-stars="46" aria-hidden="true"></div>
+          <div className="mini-planet p-ice" style={{ top: "10%", right: "7%" }} aria-hidden="true"></div>
           <div className="wrap">
-            <div className="copy">
+            <div className="copy reveal">
               <p className="label">Mission brief</p>
               <h2 data-testid="lore-title">The roadster never landed. We fix that.</h2>
               <p>On October 15, 2026 Tesla finally unveiled the new Roadster near Waco, Texas. It uses SpaceX cold-gas thrusters to spin, lift over other cars and land again, with production planned for 2028. The first roadster, the red one launched into space in 2018, is still circling the Sun and has never touched Mars.</p>
               <p>FlyingTeslaRoadster finishes the drive. Gas spent, brakes removed, destination: the red planet. Humans crawl, fly and carpool behind it, and every meme is another kilometre of road.</p>
             </div>
-            <div className="telemetry" data-testid="telemetry-panel">
+            <div className="telemetry reveal d2" data-testid="telemetry-panel">
               <h3>Telemetry</h3>
               <dl>
                 <div className="row"><dt>Status</dt><dd className="ok">En route</dd></div>
@@ -354,14 +386,26 @@ export default function MarsterPage() {
         </section>
 
         {/* ================= MEMES ================= */}
-        <section className="memes" id="memes" data-testid="memes-section">
+        <section className="memes spacey" id="memes" data-testid="memes-section">
+          <div className="cosmos" data-stars="56" aria-hidden="true"></div>
+          <div className="comet c1" aria-hidden="true"></div>
+          <div className="satellite" style={{ top: "8%", right: "12%" }} aria-hidden="true">
+            <svg viewBox="0 0 80 44">
+              <rect x="30" y="12" width="20" height="20" rx="4" fill="#d9d9e3"/>
+              <rect x="2" y="16" width="24" height="12" rx="2" fill="#2f6fb2" stroke="#8be9ff" strokeWidth="1.5"/>
+              <rect x="54" y="16" width="24" height="12" rx="2" fill="#2f6fb2" stroke="#8be9ff" strokeWidth="1.5"/>
+              <circle cx="40" cy="22" r="5" fill="#ffcf3d"/>
+              <line x1="40" y1="32" x2="40" y2="42" stroke="#d9d9e3" strokeWidth="2"/>
+              <circle cx="40" cy="42" r="2.5" fill="#ef3a24"/>
+            </svg>
+          </div>
           <div className="wrap">
             <p className="label">Meme bay</p>
             <h2>Humans, in transit</h2>
             <p className="intro-line">Four ways the timeline gets to Mars.</p>
             <div className="meme-grid">
 
-              <figure className="meme" data-testid="meme-crawl">
+              <figure className="meme reveal" data-testid="meme-crawl">
                 <div className="frame">
                   <svg viewBox="0 0 320 240" role="img" aria-label="A person in a helmet crawling on all fours along a road toward Mars">
                     <defs><linearGradient id="gA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#0f0618"/><stop offset="1" stopColor="#3a1747"/></linearGradient></defs>
@@ -383,7 +427,7 @@ export default function MarsterPage() {
                 </div>
               </figure>
 
-              <figure className="meme" data-testid="meme-riders">
+              <figure className="meme reveal d1" data-testid="meme-riders">
                 <div className="frame">
                   <svg viewBox="0 0 320 240" role="img" aria-label="Two people holding on to the roof of a flying red roadster with a flame behind it">
                     <defs><linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#0f0618"/><stop offset="1" stopColor="#5a2142"/></linearGradient></defs>
@@ -397,7 +441,7 @@ export default function MarsterPage() {
                 </div>
               </figure>
 
-              <figure className="meme" data-testid="meme-gas">
+              <figure className="meme reveal d2" data-testid="meme-gas">
                 <div className="frame">
                   <svg viewBox="0 0 320 240" role="img" aria-label="A red roadster coasting through space next to a fuel gauge pointing at empty">
                     <defs><linearGradient id="gC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#0f0618"/><stop offset="1" stopColor="#2a1138"/></linearGradient></defs>
@@ -418,7 +462,7 @@ export default function MarsterPage() {
                 </div>
               </figure>
 
-              <figure className="meme" data-testid="meme-arrived">
+              <figure className="meme reveal d3" data-testid="meme-arrived">
                 <div className="frame">
                   <svg viewBox="0 0 320 240" role="img" aria-label="A red roadster parked on Mars next to a red flag">
                     <defs><linearGradient id="gD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#3a1747"/><stop offset=".6" stopColor="#d9593a"/><stop offset="1" stopColor="#ff9356"/></linearGradient></defs>
@@ -441,9 +485,12 @@ export default function MarsterPage() {
         </section>
 
         {/* ================= FLIGHT PLAN / ROAD ================= */}
-        <section className="plan" id="flightplan" data-testid="flightplan-section">
+        <section className="plan spacey" id="flightplan" data-testid="flightplan-section">
+          <div className="cosmos" data-stars="60" aria-hidden="true"></div>
+          <div className="mini-planet p-mars" style={{ top: "6%", left: "4%" }} aria-hidden="true"></div>
+          <div className="ring-deco" style={{ width: "220px", height: "220px", bottom: "8%", right: "-70px" }} aria-hidden="true"></div>
           <div className="wrap">
-            <div className="head">
+            <div className="head reveal">
               <p className="label">Flight plan</p>
               <h2 data-testid="flightplan-title">The road to Mars</h2>
               <p>Scroll to drive. Each sign shows how far the convoy still has to go.</p>
@@ -461,28 +508,28 @@ export default function MarsterPage() {
                 </svg>
               </div>
 
-              <article className="stop left" data-testid="roadmap-stop-1">
+              <article className="stop left reveal" data-testid="roadmap-stop-1">
                 <div className="sign">
                   <p className="km">225,000,000 km to Mars</p>
                   <h3>Launch pad</h3>
                   <p>Fair launch on pump.fun. Socials go live, the first memes hit the timeline, and the roadster leaves the garage.</p>
                 </div>
               </article>
-              <article className="stop right" data-testid="roadmap-stop-2">
+              <article className="stop right reveal" data-testid="roadmap-stop-2">
                 <div className="sign">
                   <p className="km">150,000,000 km to Mars</p>
                   <h3>Leave orbit</h3>
                   <p>Raids, meme contests and daily posting. The goal is to fill the bonding curve and graduate the token.</p>
                 </div>
               </article>
-              <article className="stop left" data-testid="roadmap-stop-3">
+              <article className="stop left reveal" data-testid="roadmap-stop-3">
                 <div className="sign">
                   <p className="km">60,000,000 km to Mars</p>
                   <h3>Get noticed</h3>
                   <p>Keep making memes until the right feeds catch them. Community art, edits and videos get pinned and boosted.</p>
                 </div>
               </article>
-              <article className="stop right" data-testid="roadmap-stop-4">
+              <article className="stop right reveal" data-testid="roadmap-stop-4">
                 <div className="sign">
                   <p className="km">0 km to Mars</p>
                   <h3>Plant the flag</h3>
@@ -494,22 +541,37 @@ export default function MarsterPage() {
         </section>
 
         {/* ================= HOW TO BUY ================= */}
-        <section className="buy" id="buy" data-testid="buy-section">
+        <section className="buy spacey" id="buy" data-testid="buy-section">
+          <div className="cosmos" data-stars="40" aria-hidden="true"></div>
+          <div className="comet c2" aria-hidden="true"></div>
           <div className="wrap">
             <p className="label">Boarding</p>
             <h2>How to get in the car</h2>
             <ol className="steps">
-              <li data-testid="buy-step-1"><div className="n">1</div><h3>Get a wallet</h3><p>Install a Solana wallet such as Phantom or Solflare and save your recovery phrase offline.</p></li>
-              <li data-testid="buy-step-2"><div className="n">2</div><h3>Add SOL</h3><p>Buy SOL on an exchange and send it to your wallet address.</p></li>
-              <li data-testid="buy-step-3"><div className="n">3</div><h3>Open pump.fun</h3><p>Connect your wallet and search for the contract address shown on this page.</p></li>
-              <li data-testid="buy-step-4"><div className="n">4</div><h3>Check, then buy</h3><p>Match the address against the one pinned on our official X before you trade.</p></li>
+              <li className="reveal" data-testid="buy-step-1"><div className="n">1</div><h3>Get a wallet</h3><p>Install a Solana wallet such as Phantom or Solflare and save your recovery phrase offline.</p></li>
+              <li className="reveal d1" data-testid="buy-step-2"><div className="n">2</div><h3>Add SOL</h3><p>Buy SOL on an exchange and send it to your wallet address.</p></li>
+              <li className="reveal d2" data-testid="buy-step-3"><div className="n">3</div><h3>Open pump.fun</h3><p>Connect your wallet and search for the contract address shown on this page.</p></li>
+              <li className="reveal d3" data-testid="buy-step-4"><div className="n">4</div><h3>Check, then buy</h3><p>Match the address against the one pinned on our official X before you trade.</p></li>
             </ol>
           </div>
         </section>
 
         {/* ================= JOIN ================= */}
-        <section className="join" id="socials" data-testid="socials-section">
-          <div className="wrap">
+        <section className="join spacey" id="socials" data-testid="socials-section">
+          <div className="cosmos" data-stars="64" aria-hidden="true"></div>
+          <div className="astro" style={{ right: "6%", top: "14%" }} aria-hidden="true">
+            <svg viewBox="0 0 80 100">
+              <circle cx="40" cy="26" r="18" fill="#eceaf5"/>
+              <ellipse cx="46" cy="26" rx="11" ry="9" fill="#8be9ff" opacity="0.9"/>
+              <rect x="24" y="44" width="32" height="34" rx="12" fill="#eceaf5"/>
+              <rect x="30" y="52" width="20" height="10" rx="3" fill="#2c1510"/>
+              <path d="M24 52 L10 66" stroke="#eceaf5" strokeWidth="9" strokeLinecap="round"/>
+              <path d="M56 52 L70 62" stroke="#eceaf5" strokeWidth="9" strokeLinecap="round"/>
+              <path d="M32 78 L28 96 M48 78 L52 96" stroke="#eceaf5" strokeWidth="10" strokeLinecap="round"/>
+              <rect x="14" y="46" width="8" height="14" rx="3" fill="#8a8aa0"/>
+            </svg>
+          </div>
+          <div className="wrap reveal">
             <p className="label">The convoy</p>
             <h2>Join the drive to Mars</h2>
             <p className="lead">Post a meme, quote the roadster, tag the ones who should see it. The road gets longer with every post.</p>
