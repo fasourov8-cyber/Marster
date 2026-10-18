@@ -1,88 +1,217 @@
-from fastapi import FastAPI, APIRouter
 from dotenv import load_dotenv
+
+load_dotenv()
+
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
-from datetime import datetime, timezone
-
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime, timezone, timedelta
+import bcrypt
+import jwt
 
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
 app = FastAPI()
-
-# Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+JWT_ALGORITHM = "HS256"
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+# ---------------- site config ----------------
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+CONFIG_ID = "site"
+DEFAULT_CONFIG = {
+    "ca": "",
+    "pumpfunUrl": "https://pump.fun",
+    "twitterUrl": "",
+    "ticker": "$MARSTER",
+    "heroSubline": "The MARSter of memes. One red roadster, one dusty road and 225 million kilometres to go. Humans are crawling, flying and carpooling there behind it.",
+}
 
-# Add your routes to the router instead of directly to app
+
+async def get_config() -> dict:
+    doc = await db.site_config.find_one({"_id": CONFIG_ID}, {"_id": 0})
+    cfg = dict(DEFAULT_CONFIG)
+    if doc:
+        cfg.update({k: v for k, v in doc.items() if k in DEFAULT_CONFIG})
+    return cfg
+
+
+class ConfigUpdate(BaseModel):
+    ca: Optional[str] = None
+    pumpfunUrl: Optional[str] = None
+    twitterUrl: Optional[str] = None
+    ticker: Optional[str] = None
+    heroSubline: Optional[str] = None
+
+
+# ---------------- auth helpers ----------------
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+
+
+def get_jwt_secret() -> str:
+    return os.environ["JWT_SECRET"]
+
+
+def create_access_token(user_id: str, email: str) -> str:
+    payload = {
+        "sub": user_id,
+        "email": email,
+        "exp": datetime.now(timezone.utc) + timedelta(hours=12),
+        "type": "access",
+    }
+    return jwt.encode(payload, get_jwt_secret(), algorithm=JWT_ALGORITHM)
+
+
+async def get_current_user(request: Request) -> dict:
+    token = request.cookies.get("access_token")
+    if not token:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        payload = jwt.decode(token, get_jwt_secret(), algorithms=[JWT_ALGORITHM])
+        if payload.get("type") != "access":
+            raise HTTPException(status_code=401, detail="Invalid token type")
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    user = await db.users.find_one({"email": payload.get("email")})
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    user["_id"] = str(user["_id"])
+    user.pop("password_hash", None)
+    return user
+
+
+# ---------------- auth endpoints ----------------
+
+class LoginBody(BaseModel):
+    email: str
+    password: str
+
+
+@api_router.post("/auth/login")
+async def login(body: LoginBody, request: Request, response: Response):
+    email = body.email.strip().lower()
+    identifier = f"{request.client.host}:{email}"
+
+    attempt = await db.login_attempts.find_one({"identifier": identifier})
+    if attempt and attempt.get("count", 0) >= 5:
+        locked_until = attempt.get("locked_until")
+        if locked_until and datetime.now(timezone.utc) < locked_until:
+            raise HTTPException(status_code=429, detail="Too many failed attempts. Try again in 15 minutes.")
+
+    user = await db.users.find_one({"email": email})
+    if not user or not verify_password(body.password, user["password_hash"]):
+        await db.login_attempts.update_one(
+            {"identifier": identifier},
+            {
+                "$inc": {"count": 1},
+                "$set": {"locked_until": datetime.now(timezone.utc) + timedelta(minutes=15)},
+            },
+            upsert=True,
+        )
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    await db.login_attempts.delete_one({"identifier": identifier})
+    token = create_access_token(str(user["_id"]), email)
+    response.set_cookie(
+        key="access_token", value=token, httponly=True, secure=True,
+        samesite="none", max_age=43200, path="/",
+    )
+    return {"email": email, "name": user.get("name", "Admin"), "role": user.get("role", "admin")}
+
+
+@api_router.post("/auth/logout")
+async def logout(response: Response):
+    response.delete_cookie("access_token", path="/")
+    return {"ok": True}
+
+
+@api_router.get("/auth/me")
+async def me(user: dict = Depends(get_current_user)):
+    return {"email": user["email"], "name": user.get("name", "Admin"), "role": user.get("role", "admin")}
+
+
+# ---------------- config endpoints ----------------
+
+@api_router.get("/config")
+async def public_config():
+    return await get_config()
+
+
+@api_router.put("/admin/config")
+async def update_config(body: ConfigUpdate, user: dict = Depends(get_current_user)):
+    updates = {k: v for k, v in body.model_dump().items() if v is not None and k in DEFAULT_CONFIG}
+    if not updates:
+        raise HTTPException(status_code=400, detail="Nothing to update")
+    updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.site_config.update_one({"_id": CONFIG_ID}, {"$set": updates}, upsert=True)
+    return await get_config()
+
+
+# ---------------- existing sample routes ----------------
+
 @api_router.get("/")
 async def root():
     return {"message": "Hello World"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
-
-# Include the router in the main app
 app.include_router(api_router)
 
+frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=[frontend_url, "http://localhost:3000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+
+@app.on_event("startup")
+async def startup():
+    await db.users.create_index("email", unique=True)
+    await db.login_attempts.create_index("identifier")
+
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@example.com").lower()
+    admin_password = os.environ.get("ADMIN_PASSWORD", "admin123")
+    existing = await db.users.find_one({"email": admin_email})
+    if existing is None:
+        await db.users.insert_one({
+            "email": admin_email,
+            "password_hash": hash_password(admin_password),
+            "name": "Admin",
+            "role": "admin",
+            "created_at": datetime.now(timezone.utc),
+        })
+        logger.info("Admin user seeded: %s", admin_email)
+    elif not verify_password(admin_password, existing["password_hash"]):
+        await db.users.update_one({"email": admin_email}, {"$set": {"password_hash": hash_password(admin_password)}})
+        logger.info("Admin password re-synced from env")
+
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

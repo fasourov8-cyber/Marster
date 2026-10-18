@@ -39,6 +39,12 @@ Ported features (all verified via screenshots):
 - Ticker marquee, Lore + Telemetry panel, Meme bay (4 animated SVG memes), Flight plan = vertical Mars road with top-down rover that follows scroll, How to buy steps, Join section with Share-the-flight tweet intent, disclaimer footer
 - Config at top of MarsterPage.jsx (CFG): ticker $FTR, ca "", links (pump.fun set, X/Telegram empty → render as "link soon" placeholders). CA chips show "Contract address posts here at launch" with disabled Copy until CFG.ca set.
 
+## Admin panel (2026-10-18)
+- /admin route: login (JWT httpOnly cookie, bcrypt, seeded admin from env, brute-force lockout) + config editor
+- Editable live via MongoDB site_config: contract address, pump.fun link, X/Twitter link, ticker, hero subline
+- GET /api/config public; PUT /api/admin/config protected. Main page fetches /api/config on load and merges over CFG defaults
+- Admin creds in /app/memory/test_credentials.md
+
 ## Backlog
 - P0: Put real CA + X/Telegram links into CFG in src/MarsterPage.jsx
 - P1: Live price/market-cap widget (dexscreener API) after launch

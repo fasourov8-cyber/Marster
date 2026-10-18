@@ -13,9 +13,33 @@ const CFG = {
 
 export default function MarsterPage() {
   const [introGone, setIntroGone] = useState(false);
+  const [subline, setSubline] = useState("The MARSter of memes. One red roadster, one dusty road and 225 million kilometres to go. Humans are crawling, flying and carpooling there behind it.");
   const rootRef = useRef(null);
 
   useEffect(() => {
+    let cancelled = false;
+    let teardown = null;
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/config`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("no config"))))
+      .then((remote) => {
+        if (remote.ca) CFG.ca = remote.ca;
+        if (remote.ticker) CFG.ticker = remote.ticker;
+        if (remote.pumpfunUrl) CFG.links[0].href = remote.pumpfunUrl;
+        CFG.links[1].href = remote.twitterUrl || "";
+        if (remote.heroSubline) setSubline(remote.heroSubline);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) teardown = runSetup();
+      });
+    return () => {
+      cancelled = true;
+      if (teardown) teardown();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const runSetup = () => {
     document.title = "FlyingTeslaRoadster";
     const root = rootRef.current;
     if (!root) return undefined;
@@ -119,7 +143,7 @@ export default function MarsterPage() {
       if (withShare) {
         const a = document.createElement("a");
         a.className = "btn ghost"; a.target = "_blank"; a.rel = "noopener";
-        a.href = "https://twitter.com/intent/tweet?text=" + encodeURIComponent("Flying Tesla Roadster is driving to the Mars. Its Called $MARSTER. 🚀 CA: " + (CFG.ca || "dropping at launch"));
+        a.href = "https://twitter.com/intent/tweet?text=" + encodeURIComponent("Flying Tesla Roadster is driving to the Mars. Its Called " + CFG.ticker + ". 🚀 CA: " + (CFG.ca || "dropping at launch"));
         a.textContent = "Share the flight";
         a.setAttribute("data-testid", "share-flight-button");
         box.appendChild(a);
@@ -307,7 +331,7 @@ export default function MarsterPage() {
       gone = true;
       cleanups.forEach((fn) => fn());
     };
-  }, []);
+  };
 
   return (
     <div ref={rootRef} data-testid="marster-home">
@@ -335,7 +359,7 @@ export default function MarsterPage() {
         <div className="wrap">
           <div className="hero-copy">
             <h1 className="rise" data-testid="hero-headline">Flying Tesla <span>Roadster</span></h1>
-            <p className="sub rise" data-testid="hero-subline">The MARSter of memes. One red roadster, one dusty road and 225 million kilometres to go. Humans are crawling, flying and carpooling there behind it.</p>
+            <p className="sub rise" data-testid="hero-subline">{subline}</p>
             <div className="actions rise" id="heroActions"></div>
             <div className="ca-chip rise" data-ca="" data-testid="ca-chip-hero"><b>CA</b><code data-testid="ca-text-hero">Contract address posts here at launch</code><button type="button" disabled data-testid="ca-copy-hero">Copy</button></div>
           </div>
