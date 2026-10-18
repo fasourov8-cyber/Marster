@@ -1,0 +1,108 @@
+{
+  "app_type": "landing_page",
+  "ambition": "A4",
+  "mode": "dark",
+  "theme": "Electric & Neon / Space",
+  "typography": {
+    "headings": "Unbounded, sans-serif",
+    "body": "Space Mono, monospace",
+    "scale": {
+      "h1": "text-5xl sm:text-6xl lg:text-7xl font-black tracking-tighter uppercase",
+      "h2": "text-4xl sm:text-5xl font-bold tracking-tight uppercase",
+      "h3": "text-2xl sm:text-3xl font-bold uppercase",
+      "body": "text-base md:text-lg leading-relaxed",
+      "mono_accent": "text-sm uppercase tracking-[0.2em] font-mono text-[#00E5FF]"
+    }
+  },
+  "colors": {
+    "background": "#050505",
+    "foreground": "#FFFFFF",
+    "mars_surface": "#3D140C",
+    "primary_accent": "#FF3B30",
+    "secondary_accent": "#00E5FF",
+    "muted": "#8A8A8E",
+    "glass": "bg-black/60 backdrop-blur-xl border border-white/10"
+  },
+  "layouts": {
+    "spacing_system": "Generous spacing. p-8, p-12, py-24 for sections.",
+    "hero": "Full height 100vh with parallax Mars background, bold typography, and a prominent call to action.",
+    "bento_grid": "Used for Tokenomics and Roadmap sections to organize content neatly amidst the chaotic meme vibe."
+  },
+  "component_instructions": {
+    "splash_screen": "Create a full-screen intro animation (z-index: 100). A red car graphic zooms horizontally across the screen leaving an exhaust/gas trail. Delay 1.5s, then fade out the splash screen.",
+    "persistent_car": "A car graphic fixed at the bottom center of the screen (z-index: 40). Apply a slight bobbing CSS animation (up/down) to simulate driving. The background sections act as the 'road' scrolling by.",
+    "copy_ca_pill": "A glassmorphism pill showing the contract address with a copy icon. Needs hover states, a neon glow, and click animation.",
+    "marquee": "Use react-fast-marquee for a ticker that repeatedly says '$MARSter - THE ONLY CAR WITH GAS FEES ON MARS' across sections."
+  },
+  "content_slots": {
+    "hero_headline": { "text": "MARSter: the only car with gas fees on Mars", "source": "brief" },
+    "hero_subline": { "text": "Leaving humans behind. Next stop: Mars.", "source": "brief" },
+    "contract_address": { "text": "0xPLACEHOLDER...PUMP", "source": "placeholder" },
+    "lore_title": { "text": "Earth is Over. We're on Mars now.", "source": "placeholder" },
+    "lore_body": { "text": "While the humans cry about earth, we strapped a rocket to a roadster and sent it to the red planet.", "source": "brief" },
+    "tokenomics_title": { "text": "Tokenomics", "source": "brief" },
+    "tokenomics_supply": { "text": "1,000,000,000 $MARSter", "source": "placeholder" },
+    "tokenomics_tax": { "text": "0% Tax (No Gas Fees on Mars)", "source": "placeholder" },
+    "roadmap_title": { "text": "Roadmap to Mars", "source": "brief" },
+    "roadmap_phase1": { "text": "Phase 1: Leave Earth", "source": "placeholder" },
+    "roadmap_phase2": { "text": "Phase 2: Orbit & Chill", "source": "placeholder" },
+    "roadmap_phase3": { "text": "Phase 3: Mars Landing", "source": "placeholder" },
+    "buy_button": { "text": "Buy on pump.fun", "source": "placeholder" }
+  },
+  "image_urls": [
+    {
+      "url": "https://images.pexels.com/photos/6628054/pexels-photo-6628054.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "category": "persistent_car",
+      "description": "Sleek red sports car. Apply a mask or clipping path to isolate it as the flying/driving Roadster."
+    },
+    {
+      "url": "https://images.pexels.com/photos/8474500/pexels-photo-8474500.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "category": "hero_background",
+      "description": "Barren rocky desert landscape resembling Mars surface."
+    },
+    {
+      "url": "https://images.pexels.com/photos/956999/milky-way-starry-sky-night-sky-star-956999.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "category": "space_background",
+      "description": "Milky way starry sky for space sections and transition backgrounds."
+    },
+    {
+      "url": "https://images.pexels.com/photos/8316664/pexels-photo-8316664.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "category": "lore_humans",
+      "description": "Crying woman representing the humans left behind on Earth."
+    },
+    {
+      "url": "https://images.pexels.com/photos/11479921/pexels-photo-11479921.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "category": "lore_astronaut",
+      "description": "Astronaut floating in zero gravity."
+    }
+  ],
+  "conversion_wiring": {
+    "primary_action": "copy_ca",
+    "location": "Hero Section and Floating Nav",
+    "behavior": "When clicked, copy the placeholder CA to clipboard and show a success toast using Sonner."
+  },
+  "motion_and_interactions": {
+    "intro_splash": "Use Framer Motion. 100vw red car zips left to right leaving a trail, delays 1.5s, then opacity fades to 0 to reveal site.",
+    "on_scroll": "Parallax effects on Mars background. Car element sticks to bottom of screen and jiggles slightly as if driving over bumps.",
+    "hover_states": "Buttons glow with neon cyan/red drop-shadow on hover. Elements scale up slightly."
+  },
+  "instructions_to_main_agent": [
+    "Use framer-motion for the splash screen and scroll animations. Splash screen should hide overflow.",
+    "For the persistent car, create a fixed container at the bottom of the viewport with z-index 40. Apply an up/down bobbing animation to the car image to simulate driving.",
+    "Ensure the hero background is dark enough for the text to be readable. Use black gradients at the bottom of sections to blend them into the next.",
+    "Implement a marquee for the token name/slogan to add degen energy.",
+    "DO NOT use a plain background; always use the space/stars or mars images with a heavy dark overlay.",
+    "Make the Copy CA button massive and obvious.",
+    "Implement Sonner for toast notifications when the CA is copied.",
+    "Make sure all texts are styled according to the typography guidelines, with glowing effects on accents."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Avoid generic centered layouts. Use asymmetry where possible.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "DO NOT apply universal transition (transition: all).",
+    "Every interaction needs micro-animations - hover states, transitions.",
+    "Use 2-3x more spacing than feels comfortable."
+  ],
+  "testing_attributes": "All interactive and key informational elements MUST include a `data-testid` attribute."
+}

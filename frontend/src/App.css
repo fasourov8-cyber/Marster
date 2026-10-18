@@ -1,0 +1,5 @@
+/* MARSter global overrides — layout handled by Tailwind utilities */
+.App {
+  min-height: 100vh;
+  background-color: #050505;
+}
