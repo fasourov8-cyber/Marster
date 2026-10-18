@@ -119,7 +119,7 @@ export default function MarsterPage() {
       if (withShare) {
         const a = document.createElement("a");
         a.className = "btn ghost"; a.target = "_blank"; a.rel = "noopener";
-        a.href = "https://twitter.com/intent/tweet?text=" + encodeURIComponent("FlyingTeslaRoadster is driving to Mars. Gas spent, no brakes. " + CFG.ticker);
+        a.href = "https://twitter.com/intent/tweet?text=" + encodeURIComponent("Flying Tesla Roadster is driving to the Mars. Its Called $MARSTER. 🚀 CA: " + (CFG.ca || "dropping at launch"));
         a.textContent = "Share the flight";
         a.setAttribute("data-testid", "share-flight-button");
         box.appendChild(a);
