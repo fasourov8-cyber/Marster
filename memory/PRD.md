@@ -45,6 +45,11 @@ Ported features (all verified via screenshots):
 - GET /api/config public; PUT /api/admin/config protected. Main page fetches /api/config on load and merges over CFG defaults
 - Admin creds in /app/memory/test_credentials.md
 
+## Editable memes (2026-10-18)
+- site_config gains memes[4]: {image, top, bottom} per slot; empty = built-in animated SVG memes
+- Admin panel Meme bay section: per-slot image URL + top/bottom captions; image URL replaces the built-in panel
+- Main page applies overrides in runSetup (captions via .cap text, image via img.meme-img covering frame)
+
 ## Backlog
 - P0: Put real CA + X/Telegram links into CFG in src/MarsterPage.jsx
 - P1: Live price/market-cap widget (dexscreener API) after launch

@@ -29,12 +29,19 @@ JWT_ALGORITHM = "HS256"
 # ---------------- site config ----------------
 
 CONFIG_ID = "site"
+DEFAULT_MEMES = [
+    {"image": "", "top": "", "bottom": ""},
+    {"image": "", "top": "", "bottom": ""},
+    {"image": "", "top": "", "bottom": ""},
+    {"image": "", "top": "", "bottom": ""},
+]
 DEFAULT_CONFIG = {
     "ca": "",
     "pumpfunUrl": "https://pump.fun",
     "twitterUrl": "",
     "ticker": "$MARSTER",
     "heroSubline": "The MARSter of memes. One red roadster, one dusty road and 225 million kilometres to go. Humans are crawling, flying and carpooling there behind it.",
+    "memes": DEFAULT_MEMES,
 }
 
 
@@ -46,12 +53,19 @@ async def get_config() -> dict:
     return cfg
 
 
+class MemeSlot(BaseModel):
+    image: str = ""
+    top: str = ""
+    bottom: str = ""
+
+
 class ConfigUpdate(BaseModel):
     ca: Optional[str] = None
     pumpfunUrl: Optional[str] = None
     twitterUrl: Optional[str] = None
     ticker: Optional[str] = None
     heroSubline: Optional[str] = None
+    memes: Optional[list[MemeSlot]] = None
 
 
 # ---------------- auth helpers ----------------

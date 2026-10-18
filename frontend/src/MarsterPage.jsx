@@ -5,6 +5,7 @@ import "./styles/marster.css";
 const CFG = {
   ticker: "$FTR",
   ca: "",
+  memes: [],
   links: [
     { label: "Buy on pump.fun", href: "https://pump.fun", primary: true, testid: "link-pumpfun" },
     { label: "X / Twitter", href: "", testid: "link-twitter" },
@@ -27,6 +28,7 @@ export default function MarsterPage() {
         if (remote.pumpfunUrl) CFG.links[0].href = remote.pumpfunUrl;
         CFG.links[1].href = remote.twitterUrl || "";
         if (remote.heroSubline) setSubline(remote.heroSubline);
+        if (Array.isArray(remote.memes)) CFG.memes = remote.memes;
       })
       .catch(() => {})
       .finally(() => {
@@ -165,6 +167,30 @@ export default function MarsterPage() {
       heroBox.appendChild(f);
     }
     renderLinks($("socialActions"), true);
+
+    /* ---- meme overrides from admin config ---- */
+    ["meme-crawl", "meme-riders", "meme-gas", "meme-arrived"].forEach((id, i) => {
+      const slot = (CFG.memes || [])[i];
+      if (!slot) return;
+      const fig = root.querySelector(`[data-testid="${id}"]`);
+      if (!fig) return;
+      const capTop = fig.querySelector(".cap.top");
+      const capBottom = fig.querySelector(".cap.bottom");
+      if (slot.top && capTop) capTop.textContent = slot.top;
+      if (slot.bottom && capBottom) capBottom.textContent = slot.bottom;
+      if (slot.image) {
+        const frame = fig.querySelector(".frame");
+        if (!frame || frame.querySelector("img.meme-img")) return;
+        const img = document.createElement("img");
+        img.className = "meme-img";
+        img.src = slot.image;
+        img.alt = slot.top || "Meme";
+        img.loading = "lazy";
+        frame.insertBefore(img, frame.firstChild);
+        const svg = frame.querySelector("svg");
+        if (svg) svg.style.display = "none";
+      }
+    });
 
     /* ---- contract address chips ---- */
     root.querySelectorAll("[data-ca]").forEach((chip) => {
