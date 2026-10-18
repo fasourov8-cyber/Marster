@@ -338,7 +338,7 @@ export default function MarsterPage() {
             <div className="copy">
               <p className="label">Mission brief</p>
               <h2 data-testid="lore-title">The roadster never landed. We fix that.</h2>
-              <p>In February 2018 a red roadster left Earth with a spacesuit-wearing mannequin at the wheel. It has been circling the Sun ever since and has never touched Mars.</p>
+              <p>On October 15, 2026 Tesla finally unveiled the new Roadster near Waco, Texas. It uses SpaceX cold-gas thrusters to spin, lift over other cars and land again, with production planned for 2028. The first roadster, the red one launched into space in 2018, is still circling the Sun and has never touched Mars.</p>
               <p>FlyingTeslaRoadster finishes the drive. Gas spent, brakes removed, destination: the red planet. Humans crawl, fly and carpool behind it, and every meme is another kilometre of road.</p>
             </div>
             <div className="telemetry" data-testid="telemetry-panel">
