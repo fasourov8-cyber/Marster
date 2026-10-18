@@ -30,8 +30,17 @@
 - pump.fun token URL, X/Twitter URL, Telegram URL, real contract address → all in src/config/siteConfig.js
 - Tokenomics numbers (supply/tax/LP/renounce) are labelled placeholders
 
+## Replaced with user's Claude-made design (2026-10-18, second iteration)
+User rejected the first build and provided their own single-file HTML made by Claude (/app/design/user-claude-version.html). It was ported verbatim into React: /app/frontend/src/MarsterPage.jsx + /app/frontend/src/styles/marster.css. Old component set (components/, sections/) is now UNUSED. App.js renders MarsterPage only.
+
+Ported features (all verified via screenshots):
+- Canvas intro flight: roadster with fire/smoke particle trail, growing Mars planet, star streaks, gas gauge draining 100→4%, km countdown 225M→0, status messages, Skip flight button, html scroll lock, reduced-motion bypass
+- Dusk-Mars hero: gradient sky, twinkling stars, sun, flyby car, parallax SVG mountains, driving roadster on scrolling road with dust puffs and MARS→ sign
+- Ticker marquee, Lore + Telemetry panel, Meme bay (4 animated SVG memes), Flight plan = vertical Mars road with top-down rover that follows scroll, How to buy steps, Join section with Share-the-flight tweet intent, disclaimer footer
+- Config at top of MarsterPage.jsx (CFG): ticker $FTR, ca "", links (pump.fun set, X/Telegram empty → render as "link soon" placeholders). CA chips show "Contract address posts here at launch" with disabled Copy until CFG.ca set.
+
 ## Backlog
-- P0: Swap real links + CA at launch
+- P0: Put real CA + X/Telegram links into CFG in src/MarsterPage.jsx
 - P1: Live price/market-cap widget (dexscreener API) after launch
 - P1: Meme gallery section for community memes
 - P2: Background music / engine SFX toggle
