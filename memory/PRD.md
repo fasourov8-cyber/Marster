@@ -55,6 +55,12 @@ Ported features (all verified via screenshots):
 - Admin meme slots: Upload button + preview thumbnail + Remove image; uploaded URL (relative /api/files/...) fills the slot's image field
 - EMERGENT_LLM_KEY added to backend/.env for storage auth
 
+## SEO / social share setup (2026-10-19)
+- Brand image (user-uploaded roadster-over-Mars art) → public/: favicon.ico, favicon-32.png, apple-touch-icon.png (180), logo512.png, marster-og.png (1200x630 OG crop)
+- index.html head: title "Flying Tesla Roadster — $MARSTER Meme Token to Mars", description, robots meta, OG + Twitter summary_large_image tags, Organization JSON-LD (no fabricated facts), real <noscript> fallback, theme-color #12081f; stale "A product of emergent.sh" / "Emergent | Fullstack App" defaults replaced
+- robots.txt (AI crawler group, Disallow /api/ + /admin), llms.txt in public/
+- PENDING (needs production domain): canonical, og:url, sitemap.xml, and converting og:image/twitter:image from root-relative "/marster-og.png" to absolute live URL; enable bot-prerender toggle at deploy; WhatsApp/FB cache OG aggressively (re-scrape after changes)
+
 ## Backlog
 - P0: Put real CA + X/Telegram links into CFG in src/MarsterPage.jsx
 - P1: Live price/market-cap widget (dexscreener API) after launch

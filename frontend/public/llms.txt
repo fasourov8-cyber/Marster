@@ -1,0 +1,14 @@
+# Flying Tesla Roadster ($MARSTER)
+
+> Flying Tesla Roadster is a meme token project: one red roadster driving the road to Mars. Humans crawl, fly and carpool behind it, and every meme is another kilometre of road. Launching on pump.fun.
+
+$MARSTER is a meme token made for fun with no intrinsic value and no promise of financial return. It is a parody project — not affiliated with Tesla, SpaceX or Elon Musk.
+
+## Pages
+
+- / — the full site: animated launch intro, Mars hero, mission brief (lore), meme bay, flight plan (roadmap to Mars), how to buy, community links
+- /admin — owner-only mission control panel (not for crawlers)
+
+## Notes
+
+- Contract address and social links are published on the site at launch.

@@ -42,7 +42,7 @@ export default function MarsterPage() {
   }, []);
 
   const runSetup = () => {
-    document.title = "FlyingTeslaRoadster";
+    document.title = "Flying Tesla Roadster — $MARSTER Meme Token to Mars";
     const root = rootRef.current;
     if (!root) return undefined;
     const $ = (id) => root.querySelector(`#${id}`);
